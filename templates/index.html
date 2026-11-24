@@ -2,48 +2,68 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>GLEM ai твой персональный друг и помощник!</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-    body { background: #0d0f14; color: #f1f5f9; display: flex; justify-content: center; height: 100vh; }
-    .app { width: 100%; max-width: 780px; display: flex; flex-direction: column; background: #13161f; border-inline: 1px solid #232838; }
-    header { padding: 16px 20px; background: #181c27; border-bottom: 1px solid #232838; display: flex; justify-content: space-between; align-items: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    html, body { background: #0d0f14; color: #f1f5f9; height: 100%; overflow: hidden; }
+    body { display: flex; justify-content: center; }
+    .app { width: 100%; max-width: 780px; height: 100dvh; display: flex; flex-direction: column; background: #13161f; border-inline: 1px solid #232838; }
+    header { padding: 14px 16px; background: #181c27; border-bottom: 1px solid #232838; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .head-btns { display: flex; gap: 8px; }
     .dot { width: 9px; height: 9px; background: #10b981; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 8px #10b981; }
-    .chat { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
-    .msg { max-width: 78%; padding: 12px 16px; border-radius: 14px; line-height: 1.5; white-space: pre-wrap; animation: pop .25s ease; position: relative; }
+    .chat { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .msg { max-width: 85%; padding: 11px 14px; border-radius: 14px; line-height: 1.45; font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; animation: pop .25s ease; position: relative; }
     @keyframes pop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .user { align-self: flex-end; background: #6366f1; color: #fff; border-bottom-right-radius: 4px; }
-    .bot { align-self: flex-start; background: #1e2332; border: 1px solid #2c3347; padding-bottom: 30px; border-bottom-left-radius: 4px; }
-    .copy { position: absolute; right: 10px; bottom: 6px; font-size: 11px; color: #94a3b8; background: none; border: none; cursor: pointer; }
+    .bot { align-self: flex-start; background: #1e2332; border: 1px solid #2c3347; padding-bottom: 28px; border-bottom-left-radius: 4px; }
+    .copy { position: absolute; right: 10px; bottom: 5px; font-size: 11px; color: #94a3b8; background: none; border: none; cursor: pointer; }
     .copy:hover { color: #fff; }
-    .bottom { padding: 14px 20px; background: #181c27; border-top: 1px solid #232838; }
-    .chips { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-    .chip, .clear { background: #222736; color: #cbd5e1; border: 1px solid #30374d; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: .2s; }
+    .bottom { padding: 10px 12px 14px; background: #181c27; border-top: 1px solid #232838; flex-shrink: 0; }
+    .chips { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip, .clear { background: #222736; color: #cbd5e1; border: 1px solid #30374d; padding: 6px 11px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: .2s; white-space: nowrap; flex-shrink: 0; }
     .chip:hover, .clear:hover { background: #2e354a; transform: translateY(-2px); color: #fff; }
-    .chip:active, .clear:active, #send:active { transform: scale(0.95); }
-    .row { display: flex; gap: 10px; }
-    input { flex: 1; padding: 12px 14px; border-radius: 12px; border: 1px solid #30374d; background: #0d0f14; color: #fff; font-size: 15px; outline: none; transition: .2s; }
+    .chip:active, .clear:active, #send:active, .lang-btn:active { transform: scale(0.95); }
+    .row { display: flex; gap: 8px; align-items: center; }
+    input { flex: 1; min-width: 0; padding: 11px 13px; border-radius: 12px; border: 1px solid #30374d; background: #0d0f14; color: #fff; font-size: 16px; outline: none; transition: .2s; }
     input:focus { border-color: #6366f1; box-shadow: 0 0 12px rgba(99,102,241,.3); }
-    #send { padding: 0 20px; border-radius: 12px; border: none; background: #6366f1; color: #fff; font-weight: 600; cursor: pointer; transition: .2s; }
+    #send { padding: 11px 16px; border-radius: 12px; border: none; background: #6366f1; color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; transition: .2s; flex-shrink: 0; }
     #send:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(99,102,241,.4); }
     #send:disabled { opacity: .5; cursor: not-allowed; }
+    .modal { position: fixed; inset: 0; background: rgba(13, 15, 20, 0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .modal-box { background: #181c27; border: 1px solid #2c3347; border-radius: 20px; padding: 24px; max-width: 340px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.5); animation: pop .3s ease; }
+    .modal-box h3 { margin-bottom: 6px; font-size: 18px; }
+    .modal-box p { color: #94a3b8; font-size: 13px; margin-bottom: 18px; }
+    .lang-btns { display: flex; gap: 10px; }
+    .lang-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #30374d; background: #222736; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: .2s; }
+    .lang-btn:hover { background: #6366f1; border-color: #6366f1; transform: translateY(-2px); }
+    @media (max-width: 780px) { .app { border-inline: none; } }
   </style>
 </head>
 <body>
+  <div class="modal" id="langModal">
+    <div class="modal-box">
+      <h3>Выберите язык / Choose language</h3>
+      <p>GLem-ai готов к работе ⚡</p>
+      <div class="lang-btns">
+        <button class="lang-btn" onclick="setLang('ru')">🇷🇺 Русский</button>
+        <button class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app">
     <header>
-      <div><span class="dot"></span><b>Джарвис AI</b></div>
-      <button class="clear" onclick="chat.innerHTML=''">Очистить</button>
-    </header>
-    <div class="chat" id="chat">
-      <div class="msg bot">Салют, бро! Я на связи. Пиши вопрос ⚡</div>
-    </div>
-    <div class="bottom">
-      <div class="chips">
-        <button class="chip" onclick="tip('Объясни простыми словами: ')">💡 Объясни просто</button>
-        <button class="chip" onclick="tip('Напиши код для: ')">💻 Напиши код</button>
-        <button class="chip" onclick="tip('Придумай 5 идей для: ')">🚀 5 идей</button>
+      <div><span class="dot"></span><b>GLem-ai</b></div>
+      <div class="head-btns">
+        <button class="clear" id="langSwitch" onclick="toggleLang()">EN</button>
+        <button class="clear" id="clearBtn" onclick="clearChat()">Очистить</button>
       </div>
+    </header>
+    <div class="chat" id="chat"></div>
+    <div class="bottom">
+      <div class="chips" id="chipsBox"></div>
       <div class="row">
         <input id="inp" placeholder="Напиши сообщение..." autocomplete="off">
         <button id="send" onclick="send()">Отправить</button>
@@ -53,28 +73,107 @@
 
   <script>
     const chat = document.getElementById('chat'), inp = document.getElementById('inp'), btn = document.getElementById('send');
+    const langModal = document.getElementById('langModal'), clearBtn = document.getElementById('clearBtn'), langSwitch = document.getElementById('langSwitch'), chipsBox = document.getElementById('chipsBox');
+
+    const i18n = {
+      ru: {
+        greet: 'Привет! Я на связи. Пиши вопрос ⚡',
+        clear: 'Очистить',
+        placeholder: 'Напиши сообщение...',
+        send: 'Отправить',
+        wait: 'Думаю... ⏳',
+        copy: 'Копировать',
+        copied: 'Готово ✓',
+        err: '❌ Ошибка сервера',
+        switchLabel: 'EN',
+        chips: [
+          ['💡 Объясни просто', 'Объясни простыми словами: '],
+          ['💻 Напиши код', 'Напиши код для: '],
+          ['🚀 5 идей', 'Придумай 5 идей для: ']
+        ]
+      },
+      en: {
+        greet: 'Hey! I am online. Ask me anything ⚡',
+        clear: 'Clear',
+        placeholder: 'Type a message...',
+        send: 'Send',
+        wait: 'Thinking... ⏳',
+        copy: 'Copy',
+        copied: 'Copied ✓',
+        err: '❌ Server error',
+        switchLabel: 'RU',
+        chips: [
+          ['💡 Explain simply', 'Explain in simple terms: '],
+          ['💻 Write code', 'Write clean code for: '],
+          ['🚀 5 ideas', 'Give me 5 cool ideas for: ']
+        ]
+      }
+    };
+
+    let lang = localStorage.getItem('glem_lang') || 'ru';
+
+    function applyLang(l) {
+      lang = l;
+      localStorage.setItem('glem_lang', l);
+      const t = i18n[l];
+      clearBtn.textContent = t.clear;
+      inp.placeholder = t.placeholder;
+      btn.textContent = t.send;
+      langSwitch.textContent = t.switchLabel;
+      chipsBox.innerHTML = '';
+      t.chips.forEach(item => {
+        const b = document.createElement('button');
+        b.className = 'chip';
+        b.textContent = item[0];
+        b.onclick = () => { inp.value = item[1]; inp.focus(); };
+        chipsBox.appendChild(b);
+      });
+    }
+
+    function setLang(l) {
+      applyLang(l);
+      langModal.style.display = 'none';
+      if (!chat.children.length) add(i18n[l].greet, 'bot');
+    }
+
+    function toggleLang() {
+      applyLang(lang === 'ru' ? 'en' : 'ru');
+    }
+
+    function clearChat() {
+      chat.innerHTML = '';
+      add(i18n[lang].greet, 'bot');
+    }
+
+    if (localStorage.getItem('glem_lang')) {
+      langModal.style.display = 'none';
+      applyLang(lang);
+      add(i18n[lang].greet, 'bot');
+    }
+
     inp.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
-    function tip(t) { inp.value = t; inp.focus(); }
+
     function add(text, cls) {
       const d = document.createElement('div');
       d.className = 'msg ' + cls;
       d.textContent = text;
       if (cls === 'bot') {
         const c = document.createElement('button');
-        c.className = 'copy'; c.textContent = 'Копировать';
-        c.onclick = () => { navigator.clipboard.writeText(text); c.textContent = 'Готово ✓'; setTimeout(() => c.textContent = 'Копировать', 1500); };
+        c.className = 'copy'; c.textContent = i18n[lang].copy;
+        c.onclick = () => { navigator.clipboard.writeText(text); c.textContent = i18n[lang].copied; setTimeout(() => c.textContent = i18n[lang].copy, 1500); };
         d.appendChild(c);
       }
       chat.appendChild(d); chat.scrollTop = chat.scrollHeight; return d;
     }
+
     async function send() {
       const text = inp.value.trim(); if (!text || btn.disabled) return;
       add(text, 'user'); inp.value = ''; btn.disabled = true;
-      const wait = add('Думаю... ⏳', 'bot');
+      const wait = add(i18n[lang].wait, 'bot');
       try {
         const r = await fetch('/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: text}) });
         const data = await r.json(); wait.remove(); add(data.reply, 'bot');
-      } catch { wait.remove(); add('❌ Ошибка сервера', 'bot'); }
+      } catch { wait.remove(); add(i18n[lang].err, 'bot'); }
       btn.disabled = false; inp.focus();
     }
   </script>
